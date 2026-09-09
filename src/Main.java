@@ -9,14 +9,13 @@ import javax.swing.*;
 public class Main {
         public static void main(String[] args) {
             
-        JFileChooser selector = new JFileChooser();
- 
-        int resultado = selector.showOpenDialog(null);
-
+            
+        JFileChooser select = new JFileChooser();
+        int result = select.showOpenDialog(null);
         
-        if (resultado == JFileChooser.APPROVE_OPTION) {
+        if (result == JFileChooser.APPROVE_OPTION) {
             // Obtener el archivo seleccionado
-            File selectedArchive = selector.getSelectedFile();
+            File selectedArchive = select.getSelectedFile();
             
              Path path = Path.of(selectedArchive.getAbsolutePath());
 
@@ -38,20 +37,14 @@ public class Main {
             
         } else {
             JOptionPane.showMessageDialog(null, "Operación cancelada por el usuario.");
-        }
-    
-           
-            
+        }     
             
 
 
 
 
 
-
-
-
-            
+         
     
         }
 }
