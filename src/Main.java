@@ -1,4 +1,5 @@
 import input.CFileReader;
+import lexer.Scanner;
 
 public class Main {
         public static void main(String[] args) {
@@ -7,6 +8,9 @@ public class Main {
             CFileReader reader = new CFileReader();
             char[] charArray = reader.readFile();   //char[] es ya un arreglo con todos los caracteres del archivo .c
 
+            Scanner scanner = new Scanner(charArray);
+            scanner.tokenizar();
 
+            
         }
 }
