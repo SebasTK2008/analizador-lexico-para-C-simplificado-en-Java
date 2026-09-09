@@ -1,21 +1,16 @@
 
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 public class Main {
         public static void main(String[] args) {
             
         JFileChooser selector = new JFileChooser();
-
-
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("C or txt archive", ".c", ".txt");
-        selector.setFileFilter(filter);
-
-        
+ 
         int resultado = selector.showOpenDialog(null);
 
         
@@ -31,12 +26,10 @@ public class Main {
 
                 String textFile = Files.readString(path);
                 System.out.println(textFile);
-                char[] charArray = textFile.toCharArray();
-
-                System.out.println("Caracteres en el archivo:");
+                char[] charArray = textFile.toCharArray(); 
                 for (char c : charArray) {
                     System.out.print(c);
-                }
+                }      
 
             } catch (IOException e) {
                 System.out.println("Ocurrió un error al leer el archivo: " + e.getMessage());
