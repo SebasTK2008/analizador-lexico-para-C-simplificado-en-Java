@@ -20,7 +20,7 @@ public class CFileReader{
         String directory = fileDialog.getDirectory();
         String filename = fileDialog.getFile();
 
-        // Si el usuario canceló, filename será null
+       
         if (filename != null) {
             File selectedFile = new File(directory, filename);
             Path path = Path.of(selectedFile.getAbsolutePath());
@@ -30,9 +30,7 @@ public class CFileReader{
             try {
                 String textFile = Files.readString(path);
                 charArray = textFile.toCharArray(); 
-                for (char c : charArray) {
-                    System.out.print(c);
-                }
+
                 return charArray;      
 
             } catch (IOException e) {

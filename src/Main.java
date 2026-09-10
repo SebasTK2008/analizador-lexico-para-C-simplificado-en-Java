@@ -1,4 +1,5 @@
 import input.CFileReader;
+import java.util.ArrayList;
 import lexer.Scanner;
 
 public class Main {
@@ -8,10 +9,12 @@ public class Main {
             CFileReader reader = new CFileReader();
             char[] charArray = reader.readFile();   //charArray es un arreglo con todos los caracteres del archivo .c
 
-            if (charArray != null) {
-                Scanner scanner = new Scanner(charArray);
-                scanner.getLexema();
+            Scanner scanner = new Scanner(charArray);
+            ArrayList<String> lexemas = scanner.getLexemas();
+
+            for (String lexema : lexemas) {
+                System.out.print(lexema+" ");
             }
-   
+            
         }
 }
