@@ -18,6 +18,13 @@ public class Scanner {
         initializeSpecialSymbols();
     }
 
+    public Token[] classifyAllTokens(String[] lexemas) {
+        Token[] tokens = new Token[lexemas.length];
+        for (int i = 0; i < lexemas.length; i++) {
+            tokens[i] = classifyToken(lexemas[i]);
+        }
+        return tokens;
+    }
 
     public Token classifyToken(String lexema){
         if (reservedWords.containsKey(lexema)) {
