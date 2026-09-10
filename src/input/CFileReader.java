@@ -14,13 +14,9 @@ public class CFileReader{
      public char[] readFile() {
         char[] charArray = null;
 
-        // 1. Crear el diálogo nativo (Usa un Frame nulo como dueño)
         FileDialog fileDialog = new FileDialog((Frame) null, "Selecciona el archivo de codigo c (.c o .txt)", FileDialog.LOAD);
-        
-        // 2. Hacerlo visible (bloquea la ejecución hasta que el usuario elija o cancele)
         fileDialog.setVisible(true);
 
-        // 3. Obtener el archivo seleccionado
         String directory = fileDialog.getDirectory();
         String filename = fileDialog.getFile();
 

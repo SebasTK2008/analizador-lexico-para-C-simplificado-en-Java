@@ -26,7 +26,7 @@ public enum TokenType {
     AND_OP,
     OR_OP,
     NOT_OP,
-    ASSING,
+    ASSIGN,
     LT,
     GT,
     SHL_OP,

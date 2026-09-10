@@ -6,10 +6,12 @@ public class Main {
 
             //crea un objeto de la clase que permite leer el archivo de texto
             CFileReader reader = new CFileReader();
-            char[] charArray = reader.readFile();   //char[] es ya un arreglo con todos los caracteres del archivo .c
+            char[] charArray = reader.readFile();   //charArray es un arreglo con todos los caracteres del archivo .c
 
-            Scanner scanner = new Scanner(charArray);
-            scanner.tokenize();
+            if (charArray != null) {
+                Scanner scanner = new Scanner(charArray);
+                scanner.getLexema();
+            }
    
         }
 }
