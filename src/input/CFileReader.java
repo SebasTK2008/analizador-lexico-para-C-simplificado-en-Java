@@ -9,22 +9,23 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 
-public class CFileReader{
+public class CFileReader{ /*clase que abre la ventana del explorador de archivos con fileDialog y lee el archivo
+                            de texto seleccionado con Files.readString() */
 
      public char[] readFile() {
         char[] charArray = null;
 
-        // 1. Crear el diálogo nativo (Usa un Frame nulo como dueño)
+        
         FileDialog fileDialog = new FileDialog((Frame) null, "Selecciona el archivo de codigo c (.c o .txt)", FileDialog.LOAD);
         
-        // 2. Hacerlo visible (bloquea la ejecución hasta que el usuario elija o cancele)
+        
         fileDialog.setVisible(true);
 
-        // 3. Obtener el archivo seleccionado
+        
         String directory = fileDialog.getDirectory();
         String filename = fileDialog.getFile();
 
-        // Si el usuario canceló, filename será null
+       
         if (filename != null) {
             File selectedFile = new File(directory, filename);
             Path path = Path.of(selectedFile.getAbsolutePath());
@@ -34,9 +35,7 @@ public class CFileReader{
             try {
                 String textFile = Files.readString(path);
                 charArray = textFile.toCharArray(); 
-                for (char c : charArray) {
-                    System.out.print(c);
-                }
+
                 return charArray;      
 
             } catch (IOException e) {
