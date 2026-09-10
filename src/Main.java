@@ -9,6 +9,11 @@ public class Main {
             //crea un objeto de la clase que permite leer el archivo de texto
             CFileReader reader = new CFileReader();
             char[] charArray = reader.readFile();   //charArray es un arreglo con todos los caracteres del archivo .c
+            
+            if(charArray==null) {
+                System.out.println("Error al leer el archivo.");
+                return;
+            }
 
             Scanner scanner = new Scanner(charArray);
             ArrayList<String> lexemas = scanner.getLexemas();
@@ -17,6 +22,6 @@ public class Main {
             for (Token token : tokens) {
                 System.out.print(token.toString()+"\n");
             }
-            
+            System.exit(0);
         }
 }
