@@ -1,6 +1,7 @@
 import input.CFileReader;
 import java.util.ArrayList;
 import lexer.Scanner;
+import token.Token;
 
 public class Main {
         public static void main(String[] args) {
@@ -11,9 +12,10 @@ public class Main {
 
             Scanner scanner = new Scanner(charArray);
             ArrayList<String> lexemas = scanner.getLexemas();
+            ArrayList<Token> tokens = scanner.classifyAllTokens(lexemas);
 
-            for (String lexema : lexemas) {
-                System.out.print(lexema+" ");
+            for (Token token : tokens) {
+                System.out.print(token.toString()+"\n");
             }
             
         }
