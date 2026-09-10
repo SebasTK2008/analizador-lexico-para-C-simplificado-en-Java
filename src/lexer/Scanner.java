@@ -3,6 +3,7 @@ package lexer;
 import token.Token;
 import token.TokenType;
 import java.util.Map;
+import java.util.ArrayList;
 
 public class Scanner {
 
@@ -18,10 +19,10 @@ public class Scanner {
         initializeSpecialSymbols();
     }
 
-    public Token[] classifyAllTokens(String[] lexemas) {
-        Token[] tokens = new Token[lexemas.length];
-        for (int i = 0; i < lexemas.length; i++) {
-            tokens[i] = classifyToken(lexemas[i]);
+    public ArrayList<Token> classifyAllTokens(ArrayList<String> lexemas) {
+        ArrayList<Token> tokens = new ArrayList<>();
+        for (int i = 0; i < lexemas.size(); i++) {
+            tokens.add(classifyToken(lexemas.get(i)));
         }
         return tokens;
     }
