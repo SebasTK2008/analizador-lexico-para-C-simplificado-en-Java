@@ -20,15 +20,16 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
 
 
     //metodo que recorre el arreglo de caracteres y retorna una lista con todos los lexemas encontrados gracias al automata.
-    public ArrayList<String> getLexema() {
+    public ArrayList<String> getLexemas() {
+        status = Status.START; //reinicia el estado del automata al comienzo de la lectura del arreglo de caracteres.
         Automaton automaton = new Automaton();
         StringBuilder lexema = new StringBuilder(); //se uso stringbuilder para ir creando el lexema a medida que se recorre el arreglo de caracteres.
         ArrayList<String> lexemas = new ArrayList<>(); 
 
         for (char c : buffer) {
-            Alfhabet alfhabet = automaton.classify(c);  //aqui toma un caracter y lo clasifica en un alfabeto.
+            Alphabet alphabet = automaton.classify(c);  //aqui toma un caracter y lo clasifica en un elementeo del alfabeto.
 
-            if (alfhabet == Alfhabet.WHITE_SPACE) {  //aqui clasifico si el caracter es un espacio en blanco.
+            if (alphabet == Alphabet.WHITE_SPACE) {  //aqui clasifico si el caracter es un espacio en blanco.
 
                 if (status != Status.START) {  //luego, si el espacio en blanco no esta al comienzo si no despues entonces se guarda el lexema.
                     
@@ -41,7 +42,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 continue; 
             }
 
-            Status nextStatus = automaton.table[status.ordinal()][alfhabet.ordinal()];  //aqui buscamos a que celda corresponde el estado actual y el alfabeto del caracter, y obtenemos el siguiente estado.
+            Status nextStatus = automaton.table[status.ordinal()][alphabet.ordinal()];  //aqui buscamos a que celda corresponde el estado actual y el alfabeto del caracter, y obtenemos el siguiente estado.
                                                                                         //esta viene siendo la transicion del automata.
 
             if (nextStatus == Status.STOP) { //si el siguiente estado es STOP entonces significa que el lexema ya termino y se guarda en la lista de lexemas.
@@ -50,7 +51,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                     lexemas.add(lexema.toString());
                 }
                 lexema.setLength(0); //luego se reinicia el lexema.
-                status = automaton.table[Status.START.ordinal()][alfhabet.ordinal()]; //y el estado tambien se reinicia comensando desde el start nuevamente.
+                status = automaton.table[Status.START.ordinal()][alphabet.ordinal()]; //y el estado tambien se reinicia comensando desde el start nuevamente.
                 lexema.append(c); //y como ya se reinicio, se comienza a leer desde el caracter actual que no pudo ser clasificado en el lexema anterior.
             } else {  //si el siguiente estado no es STOP entonces significa que el lexema sigue y se hace append del caracter al lexema.
                 lexema.append(c);

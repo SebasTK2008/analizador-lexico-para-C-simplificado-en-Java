@@ -10,7 +10,7 @@ public class Main {
             char[] charArray = reader.readFile();   //char[] es ya un arreglo con todos los caracteres del archivo .c
 
             Scanner scanner = new Scanner(charArray);
-            ArrayList<String> lexemas = scanner.getLexema();
+            ArrayList<String> lexemas = scanner.getLexemas();
 
             for (String lexema : lexemas) {
                 System.out.print(lexema+" ");

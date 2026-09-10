@@ -1,6 +1,6 @@
 package lexer;
 
-public enum Alfhabet { //un enum que almacena los alfabetos que se usaran para clasificar un caracter en un lexema.
+public enum Alphabet {
     UNDERSCORE, // este es _
     LETTER,  //estas son las letras [a-z A-Z]
     DIGIT, // digitos [0-9]
