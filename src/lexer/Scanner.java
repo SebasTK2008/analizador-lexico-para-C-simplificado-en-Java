@@ -111,8 +111,8 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 Map.entry("if", TokenType.IF),
                 Map.entry("while", TokenType.WHILE),
                 Map.entry("return", TokenType.RETURN),
-                Map.entry("read", TokenType.READ),
-                Map.entry("write", TokenType.WRITE)
+                Map.entry("scanf", TokenType.READ),
+                Map.entry("printf", TokenType.WRITE)
         );
     }
 
