@@ -11,8 +11,8 @@ public class Scanner {
     }
 
 
-    public void classifyToken(){
-
+    public void classifyToken(String lexema){
+        
 
     }
 
@@ -20,8 +20,8 @@ public class Scanner {
         this.status = status;
     }
 
-    public void tokenize(){
-        
+    public String getLexema(){
+        return "";
     }
 
     
