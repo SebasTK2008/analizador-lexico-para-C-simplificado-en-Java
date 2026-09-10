@@ -20,7 +20,7 @@ public class Scanner {
         this.status = status;
     }
 
-    public void tokenizar(){
+    public void tokenize(){
         
     }
 
