@@ -42,6 +42,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
             }
 
             Status nextStatus = automaton.table[status.ordinal()][alfhabet.ordinal()];  //aqui buscamos a que celda corresponde el estado actual y el alfabeto del caracter, y obtenemos el siguiente estado.
+                                                                                        //esta viene siendo la transicion del automata.
 
             if (nextStatus == Status.STOP) { //si el siguiente estado es STOP entonces significa que el lexema ya termino y se guarda en la lista de lexemas.
                 
