@@ -34,7 +34,7 @@ public class Automaton {
         if (c == '{' || c == '}' || c == '[' || c == ']' || c == '(' || c == ')' || c == ';' || c == '+' || c == '-' || c == '*' || c == '/' || c == ',') {
             return Alphabet.SIMBOL;
         }
-        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\u000B') { 
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == 0x000B) { // 0x000B es equivalente al \v, que es un salto de linea vertical.
             return Alphabet.WHITE_SPACE;
         }
         return Alphabet.INVALID;

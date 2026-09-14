@@ -16,12 +16,16 @@ public class Main {
             }
 
             Scanner scanner = new Scanner(charArray);
-            ArrayList<String> lexemas = scanner.getLexemas();
-            ArrayList<Token> tokens = scanner.classifyAllTokens(lexemas);
-
-            for (Token token : tokens) {
-                System.out.print(token.toString()+"\n");
+            try {
+                ArrayList<String> lexemas = scanner.getLexemas();
+                ArrayList<Token> tokens = scanner.classifyAllTokens(lexemas);
+                for (Token token : tokens) {
+                    System.out.print(token.toString()+"\n");
+                }
+                System.exit(0);
+            }catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return;
             }
-            System.exit(0);
         }
 }

@@ -52,8 +52,13 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
         StringBuilder lexema = new StringBuilder(); //se uso stringbuilder para ir creando el lexema a medida que se recorre el arreglo de caracteres.
         ArrayList<String> lexemas = new ArrayList<>(); 
 
-        for (char c : buffer) {
+        for (int i = 0; i < buffer.length; i++) {
+            char c = buffer[i];
             Alphabet alphabet = automaton.classify(c);  //aqui toma un caracter y lo clasifica en un elementeo del alfabeto.
+
+            if (alphabet == Alphabet.INVALID) {
+                throw new IllegalArgumentException("Caracter no reconocido '" + c + "' en la posición " + i);
+            }  
 
             if (alphabet == Alphabet.WHITE_SPACE) {  //aqui clasifico si el caracter es un espacio en blanco.
 
