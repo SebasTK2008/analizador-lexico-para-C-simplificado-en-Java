@@ -1,20 +1,31 @@
 import input.CFileReader;
 import java.util.ArrayList;
 import lexer.Scanner;
+import token.Token;
 
 public class Main {
         public static void main(String[] args) {
 
             //crea un objeto de la clase que permite leer el archivo de texto
             CFileReader reader = new CFileReader();
-            char[] charArray = reader.readFile();   //char[] es ya un arreglo con todos los caracteres del archivo .c
+            char[] charArray = reader.readFile();   //charArray es un arreglo con todos los caracteres del archivo .c
+            
+            if(charArray==null) {
+                System.out.println("Error al leer el archivo.");
+                return;
+            }
 
             Scanner scanner = new Scanner(charArray);
-            ArrayList<String> lexemas = scanner.getLexema();
-
-            for (String lexema : lexemas) {
-                System.out.print(lexema+" ");
+            try {
+                ArrayList<String> lexemas = scanner.getLexemas();
+                ArrayList<Token> tokens = scanner.classifyAllTokens(lexemas);
+                for (Token token : tokens) {
+                    System.out.print(token.toString()+"\n");
+                }
+                System.exit(0);
+            }catch (IllegalArgumentException e) {
+                System.out.println("Error: " + e.getMessage());
+                return;
             }
-            
         }
 }
