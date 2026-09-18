@@ -10,20 +10,72 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
     private Status status;
     private char[] buffer;
     private Map<String, TokenType> reservedWords;
+    private Map<String, TokenType> preprocessorDirectives;
     private Map<String, TokenType> specialSymbols;
+    private static final String NEW_LINE = "\n";
 
     public Scanner(char[] buffer) {
         this.buffer = buffer;
         status = Status.START;
         initializeReservedWords();
+        initializePreprocessorDirectives();
         initializeSpecialSymbols();
     }
 
     public ArrayList<Token> classifyAllTokens(ArrayList<String> lexemas) {
         ArrayList<Token> tokens = new ArrayList<>();
-        for (int i = 0; i < lexemas.size(); i++) {
-            tokens.add(classifyToken(lexemas.get(i)));
+        boolean expectingDirective = false; //esta variable indica si se espera una directiva de preprocesamiento despues del simbolo #.
+        boolean atLineStart = true; 
+
+        for (String lexema : lexemas) {
+            if (lexema.equals(NEW_LINE)) {
+                if (expectingDirective) {
+                    throw new IllegalArgumentException("Se esperaba una directiva de preprocesamiento después del símbolo '#'");
+                }
+
+                atLineStart = true;
+                continue;
+            }
+
+            if (lexema.equals("#")) {
+                if (!atLineStart) {
+                    throw new IllegalArgumentException("El símbolo '#' debe aparecer al inicio de una línea.");
+                }
+
+                atLineStart = false;
+                expectingDirective = true;
+                tokens.add(new Token(TokenType.HASH, lexema));
+                continue;
+            }
+
+            // Si se esperaba una directiva de preprocesamiento después del símbolo '#', se verifica si el lexema actual es una directiva válida.
+            if (expectingDirective) {
+                TokenType directiveType = preprocessorDirectives.get(lexema);
+
+                if (directiveType == null) {
+                    throw new IllegalArgumentException("Directiva de preprocesamiento no reconocida: " + lexema);
+                }
+                
+                tokens.add(new Token(directiveType, lexema));
+                expectingDirective = false;
+                atLineStart = false;
+                continue;
+            }
+
+            // Verifica si el lexema es una directiva de preprocesamiento y no una palabra reservada, ademas de que no se esperaba una directiva. Si es así, lanza una excepción.
+            if (preprocessorDirectives.containsKey(lexema) && !reservedWords.containsKey(lexema)) {
+                throw new IllegalArgumentException("El nombre '" + lexema + "' es una directiva de preprocesamiento y no puede ser usado como identificador.");
+            }
+
+            atLineStart = false;
+            tokens.add(classifyToken(lexema));
         }
+
+        // Si al final del bucle todavía se esperaba una directiva de preprocesamiento, lanza una excepción.
+        if (expectingDirective) {
+            throw new IllegalArgumentException("Se esperaba una directiva de preprocesamiento después del símbolo '#'");
+        }
+
         return tokens;
     }
 
@@ -38,7 +90,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
         }
         if (reservedWords.containsKey(lexema)) {
             return new Token(reservedWords.get(lexema), lexema);
-        } 
+        }
         if (specialSymbols.containsKey(lexema)) {
             return new Token(specialSymbols.get(lexema), lexema);
         }
@@ -99,6 +151,18 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
             }  
 
             if (alphabet == Alphabet.WHITE_SPACE) {  //aqui clasifico si el caracter es un espacio en blanco.
+
+                if (c == '\n') {
+                    if (status != Status.START && automaton.isAceptance(status)) {
+                        lexemas.add(lexema.toString());
+                        lexema.setLength(0);
+                    }
+
+                    lexemas.add(NEW_LINE);
+                    status = Status.START;
+                    i++;
+                    continue;
+                }
 
                 if (status != Status.START) {  //luego, si el espacio en blanco no esta al comienzo si no despues entonces se guarda el lexema.
                     
@@ -219,11 +283,16 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 Map.entry("goto", TokenType.GOTO),
                 Map.entry("sizeof", TokenType.SIZEOF),
                 Map.entry("volatile", TokenType.VOLATILE),
-                Map.entry("static", TokenType.STATIC),
+                Map.entry("static", TokenType.STATIC)
+        );
+    }
 
-                //directivas de preprocesamiento (el simbolo # se clasifica aparte como HASH)
+    private void initializePreprocessorDirectives() {
+        preprocessorDirectives = Map.ofEntries(
                 Map.entry("include", TokenType.PREPROC_INCLUDE),
                 Map.entry("define", TokenType.PREPROC_DEFINE),
+                Map.entry("if", TokenType.PREPROC_IF),
+                Map.entry("else", TokenType.PREPROC_ELSE),
                 Map.entry("elif", TokenType.PREPROC_ELIF),
                 Map.entry("endif", TokenType.PREPROC_ENDIF),
                 Map.entry("error", TokenType.PREPROC_ERROR),

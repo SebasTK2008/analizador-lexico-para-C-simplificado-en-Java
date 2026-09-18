@@ -44,6 +44,8 @@ public enum TokenType {
     HASH,           // #
     PREPROC_INCLUDE,
     PREPROC_DEFINE,
+    PREPROC_IF,
+    PREPROC_ELSE,
     PREPROC_ELIF,
     PREPROC_ENDIF,
     PREPROC_ERROR,

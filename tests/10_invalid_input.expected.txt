@@ -1,0 +1,2 @@
+EXPECTED ERROR: invalid character '@' must be reported with its position.
+When tested independently, the unterminated string must also be reported.

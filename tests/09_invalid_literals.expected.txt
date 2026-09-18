@@ -1,0 +1,2 @@
+EXPECTED ERROR: invalid character literal or invalid escape sequence.
+The scanner must report the first invalid literal with its position.
