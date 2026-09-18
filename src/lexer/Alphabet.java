@@ -11,6 +11,10 @@ public enum Alphabet {
     NEGATION,
     OR,
     AND,
-    WHITE_SPACE // espacio en blanco, tabulacion o salto de linea
+    WHITE_SPACE, // espacio en blanco, tabulacion o salto de linea
+    HASH,
+    CARET,
+    DOT,
+    TILDE,
+    INVALID
 }
-   

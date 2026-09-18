@@ -31,10 +31,13 @@ public class Automaton {
         if (c == '!') return Alphabet.NEGATION;
         if (c == '|') return Alphabet.OR;
         if (c == '&') return Alphabet.AND;
-        if (c=='{'||c=='}'||c=='['||c==']'||c=='('||c==')'||c==';'||c=='+'||c=='-'||c=='*'||c=='/'||c==',') {
+        if (c == '{' || c == '}' || c == '[' || c == ']' || c == '(' || c == ')' || c == ';' || c == '+' || c == '-' || c == '*' || c == '/' || c == ',') {
             return Alphabet.SIMBOL;
         }
-        return Alphabet.WHITE_SPACE;  
+        if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == 0x000B) { // 0x000B es equivalente al \v, que es un salto de linea vertical.
+            return Alphabet.WHITE_SPACE;
+        }
+        return Alphabet.INVALID;
     }
 
     //aqui se definieron los estados que son de aceptacion de la tabla de transiciones.
