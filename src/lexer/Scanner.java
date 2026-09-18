@@ -1,9 +1,9 @@
 package lexer;
 
+import java.util.ArrayList;
+import java.util.Map;
 import token.Token;
 import token.TokenType;
-import java.util.Map;
-import java.util.ArrayList;
 
 public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un lexema, lo guarda en una lista de lexemas en donde luego cada lexema sera clasificado por tipo.
 
@@ -28,6 +28,14 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
     }
 
     public Token classifyToken(String lexema){
+        //los literales de cadena y de caracter se detectan primero porque su contenido
+        //puede incluir cualquier caracter y no deben buscarse en los demas mapas.
+        if (isStringLiteral(lexema)) {
+            return new Token(TokenType.STRING, lexema);
+        }
+        if (isCharLiteral(lexema)) {
+            return new Token(TokenType.CHAR_LIT, lexema);
+        }
         if (reservedWords.containsKey(lexema)) {
             return new Token(reservedWords.get(lexema), lexema);
         } 
@@ -52,8 +60,38 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
         StringBuilder lexema = new StringBuilder(); //se uso stringbuilder para ir creando el lexema a medida que se recorre el arreglo de caracteres.
         ArrayList<String> lexemas = new ArrayList<>(); 
 
-        for (int i = 0; i < buffer.length; i++) {
+        int i = 0;
+        while (i < buffer.length) {
             char c = buffer[i];
+
+            //manejo especial de literales de cadena ("..."), ya que su contenido puede incluir
+            //cualquier caracter (incluso los que el alfabeto general no reconoce) y secuencias
+            //de escape como \n, \t, \", \\, etc.
+            if (c == '"') {
+                if (status != Status.START) { //si habia un lexema en construccion se cierra antes de empezar la cadena.
+                    if (automaton.isAceptance(status)) {
+                        lexemas.add(lexema.toString());
+                    }
+                    lexema.setLength(0);
+                    status = Status.START;
+                }
+                i = readQuotedLiteral(buffer, i, '"', lexemas);
+                continue;
+            }
+
+            //manejo especial de literales de caracter ('...'), misma razon que las cadenas.
+            if (c == '\'') {
+                if (status != Status.START) {
+                    if (automaton.isAceptance(status)) {
+                        lexemas.add(lexema.toString());
+                    }
+                    lexema.setLength(0);
+                    status = Status.START;
+                }
+                i = readQuotedLiteral(buffer, i, '\'', lexemas);
+                continue;
+            }
+
             Alphabet alphabet = automaton.classify(c);  //aqui toma un caracter y lo clasifica en un elementeo del alfabeto.
 
             if (alphabet == Alphabet.INVALID) {
@@ -70,6 +108,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                     lexema.setLength(0);  //si el espacio en blanco esta al comienzo entonces no se hace append y se reinicia el lexema.
                 }
                 status = Status.START;  //y si el espacio en blanco esta al comienzo entonces se reinicia el estado del automata al caracter despues del espacio.
+                i++;
                 continue; 
             }
 
@@ -88,6 +127,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 lexema.append(c);
                 status = nextStatus;
             }
+            i++;
         }
 
         if (automaton.isAceptance(status) && lexema.length() > 0) { //al final del recorrido del arreglo de caracteres, si el estado actual es de aceptacion y el lexema no esta vacio, entonces se guarda el lexema en la lista de lexemas.
@@ -95,6 +135,41 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
         }
 
         return lexemas;
+    }
+
+    //lee un literal delimitado por comillas (dobles o simples) a partir de la posicion 'start' (donde esta la comilla de apertura),
+    //respetando las secuencias de escape (\n, \t, \r, \0, \\, \v, \f, \a, \", \'), y agrega el lexema completo (con comillas incluidas)
+    //a la lista de lexemas. Retorna el indice siguiente a la comilla de cierre.
+    private int readQuotedLiteral(char[] buffer, int start, char quote, ArrayList<String> lexemas) {
+        StringBuilder literal = new StringBuilder();
+        literal.append(quote);
+        int i = start + 1;
+        boolean closed = false;
+
+        while (i < buffer.length) {
+            char sc = buffer[i];
+            if (sc == '\\' && i + 1 < buffer.length) { //secuencia de escape: se toma el backslash y el caracter siguiente como una unidad.
+                literal.append(sc).append(buffer[i + 1]);
+                i += 2;
+                continue;
+            }
+            if (sc == quote) {
+                literal.append(sc);
+                i++;
+                closed = true;
+                break;
+            }
+            literal.append(sc);
+            i++;
+        }
+
+        if (!closed) {
+            String tipo = (quote == '"') ? "Cadena de texto" : "Caracter literal";
+            throw new IllegalArgumentException(tipo + " sin cerrar a partir de la posición " + start);
+        }
+
+        lexemas.add(literal.toString());
+        return i;
     }
     
     public void setStatus(Status status) {
@@ -107,6 +182,7 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
 
     private void initializeReservedWords() {
         reservedWords = Map.ofEntries(
+                //palabras reservadas del lenguaje C simplificado
                 Map.entry("int", TokenType.INT),
                 Map.entry("main", TokenType.MAIN),
                 Map.entry("void", TokenType.VOID),
@@ -117,7 +193,44 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 Map.entry("while", TokenType.WHILE),
                 Map.entry("return", TokenType.RETURN),
                 Map.entry("scanf", TokenType.READ),
-                Map.entry("printf", TokenType.WRITE)
+                Map.entry("printf", TokenType.WRITE),
+
+                //palabras reservadas adicionales del lenguaje C completo
+                Map.entry("auto", TokenType.AUTO),
+                Map.entry("double", TokenType.DOUBLE),
+                Map.entry("struct", TokenType.STRUCT),
+                Map.entry("long", TokenType.LONG),
+                Map.entry("switch", TokenType.SWITCH),
+                Map.entry("case", TokenType.CASE),
+                Map.entry("enum", TokenType.ENUM),
+                Map.entry("register", TokenType.REGISTER),
+                Map.entry("typedef", TokenType.TYPEDEF),
+                Map.entry("char", TokenType.CHAR),
+                Map.entry("extern", TokenType.EXTERN),
+                Map.entry("union", TokenType.UNION),
+                Map.entry("const", TokenType.CONST),
+                Map.entry("float", TokenType.FLOAT),
+                Map.entry("short", TokenType.SHORT),
+                Map.entry("unsigned", TokenType.UNSIGNED),
+                Map.entry("continue", TokenType.CONTINUE),
+                Map.entry("for", TokenType.FOR),
+                Map.entry("signed", TokenType.SIGNED),
+                Map.entry("default", TokenType.DEFAULT),
+                Map.entry("goto", TokenType.GOTO),
+                Map.entry("sizeof", TokenType.SIZEOF),
+                Map.entry("volatile", TokenType.VOLATILE),
+                Map.entry("static", TokenType.STATIC),
+
+                //directivas de preprocesamiento (el simbolo # se clasifica aparte como HASH)
+                Map.entry("include", TokenType.PREPROC_INCLUDE),
+                Map.entry("define", TokenType.PREPROC_DEFINE),
+                Map.entry("elif", TokenType.PREPROC_ELIF),
+                Map.entry("endif", TokenType.PREPROC_ENDIF),
+                Map.entry("error", TokenType.PREPROC_ERROR),
+                Map.entry("ifdef", TokenType.PREPROC_IFDEF),
+                Map.entry("ifndef", TokenType.PREPROC_IFNDEF),
+                Map.entry("message", TokenType.PREPROC_MESSAGE),
+                Map.entry("undef", TokenType.PREPROC_UNDEF)
         );
     }
 
@@ -137,6 +250,8 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 Map.entry("&", TokenType.AND_OP),
                 Map.entry("|", TokenType.OR_OP),
                 Map.entry("!", TokenType.NOT_OP),
+                Map.entry("^", TokenType.XOR_OP),
+                Map.entry("~", TokenType.BW_NOT),
                 Map.entry("=", TokenType.ASSIGN),
                 Map.entry("<", TokenType.LT),
                 Map.entry(">", TokenType.GT),
@@ -148,7 +263,10 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 Map.entry(">=", TokenType.GTEQ),
                 Map.entry("&&", TokenType.ANDAND),
                 Map.entry("||", TokenType.OROR),
-                Map.entry(",", TokenType.COMMA)
+                Map.entry(",", TokenType.COMMA),
+                Map.entry(".", TokenType.DOT),
+                Map.entry("->", TokenType.ARROW),
+                Map.entry("#", TokenType.HASH)
         );
     }
 
@@ -188,5 +306,13 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
             }
         }
         return true;
+    }
+
+    private boolean isStringLiteral(String lexema) {
+        return lexema.length() >= 2 && lexema.charAt(0) == '"' && lexema.charAt(lexema.length() - 1) == '"';
+    }
+
+    private boolean isCharLiteral(String lexema) {
+        return lexema.length() >= 2 && lexema.charAt(0) == '\'' && lexema.charAt(lexema.length() - 1) == '\'';
     }
 }
