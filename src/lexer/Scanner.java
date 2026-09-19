@@ -62,11 +62,6 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
                 continue;
             }
 
-            // Verifica si el lexema es una directiva de preprocesamiento y no una palabra reservada, ademas de que no se esperaba una directiva. Si es así, lanza una excepción.
-            if (preprocessorDirectives.containsKey(lexema) && !reservedWords.containsKey(lexema)) {
-                throw new IllegalArgumentException("El nombre '" + lexema + "' es una directiva de preprocesamiento y no puede ser usado como identificador.");
-            }
-
             atLineStart = false;
             tokens.add(classifyToken(lexema));
         }
@@ -267,10 +262,6 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
     
     public void setStatus(Status status) {
         this.status = status;
-    }
-
-    public String getLexema(){
-        return "";
     }
 
     private void initializeReservedWords() {
