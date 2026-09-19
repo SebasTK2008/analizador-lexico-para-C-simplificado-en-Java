@@ -207,29 +207,58 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
     private int readQuotedLiteral(char[] buffer, int start, char quote, ArrayList<String> lexemas) {
         StringBuilder literal = new StringBuilder();
         literal.append(quote);
+
         int i = start + 1;
+        int contentUnits = 0;
         boolean closed = false;
 
         while (i < buffer.length) {
             char sc = buffer[i];
-            if (sc == '\\' && i + 1 < buffer.length) { //secuencia de escape: se toma el backslash y el caracter siguiente como una unidad.
-                literal.append(sc).append(buffer[i + 1]);
-                i += 2;
-                continue;
-            }
+
+            // La comilla correspondiente cierra el literal.
             if (sc == quote) {
                 literal.append(sc);
-                i++;
                 closed = true;
+                i++;
                 break;
             }
+
+            // No se permiten saltos de línea reales dentro del literal.
+            if (sc == '\n' || sc == '\r') {
+                throw new IllegalArgumentException("El literal no puede contener un salto de línea en la posición " + i);
+            }
+
+            // Procesamiento de una secuencia de escape.
+            if (sc == '\\') {
+                if (i + 1 >= buffer.length) {
+                    throw new IllegalArgumentException("Secuencia de escape incompleta en la posición " + i);
+                }
+
+                char escapedChar = buffer[i + 1];
+
+                if (!isValidEscape(escapedChar)) {
+                    throw new IllegalArgumentException("Secuencia de escape inválida: \\" + escapedChar + " en la posición " + i);
+                }
+
+                literal.append(sc).append(escapedChar);
+                i += 2;
+                contentUnits++;
+                continue;
+            }
+
+            //Carácter normal dentro del literal.
             literal.append(sc);
+            contentUnits++;
             i++;
         }
 
         if (!closed) {
-            String tipo = (quote == '"') ? "Cadena de texto" : "Caracter literal";
-            throw new IllegalArgumentException(tipo + " sin cerrar a partir de la posición " + start);
+            String literalType = (quote == '"') ? "Cadena de texto" : "Caracter literal";
+            throw new IllegalArgumentException(literalType + " sin cerrar a partir de la posición " + start);
+        }
+
+        if (quote == '\'' && contentUnits != 1) {
+            throw new IllegalArgumentException("Caracter literal debe contener exactamente un carácter (o una secuencia de escape)");
         }
 
         lexemas.add(literal.toString());
@@ -383,5 +412,9 @@ public class Scanner { //esta clase recorre el arreglo de caracteres, obtiene un
 
     private boolean isCharLiteral(String lexema) {
         return lexema.length() >= 2 && lexema.charAt(0) == '\'' && lexema.charAt(lexema.length() - 1) == '\'';
+    }
+
+    private boolean isValidEscape(char c) {
+        return c == 'n' || c == 't' || c == 'r' || c == '0' || c == '\\' || c == 'v' || c == 'f' || c == 'a' || c == '"' || c == '\'';
     }
 }
